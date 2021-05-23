@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -16,18 +17,7 @@ namespace WebApplication1.Areas.Users.Controllers
     {
         public async Task<IActionResult> Index()
         {
-            //var client = new RestClient("https://localhost:44347/api/User/refresh-token");
-            //client.Timeout = -1;
-            //var request = new RestRequest(Method.POST);
-            //IRestResponse response = client.Execute(request);
-            //dynamic resp = JsonConvert.DeserializeObject(response.Content);
-            //var isAuthenticated = resp.isAuthenticated;
-            //if(isAuthenticated==true)
-            //{
-
-            //}
-            //Console.WriteLine(response.Content);
-
+            var refreshToken = Request.Cookies["refreshToken"];
             CookieContainer cookieContainer = new CookieContainer();
             HttpClientHandler handler = new HttpClientHandler
             {
@@ -35,15 +25,25 @@ namespace WebApplication1.Areas.Users.Controllers
             };
             handler.CookieContainer = cookieContainer;
             var client = new HttpClient(handler);
+            var req = new
+            {
+                Token = refreshToken
+            };
+            var req1 = JsonConvert.SerializeObject(req);
+            var stringContent = new StringContent(req1, Encoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
 
 
-            var loginResponse = await client.PostAsync("https://localhost:44347/api/User/refresh-token", null);
+            var loginResponse = await client.PostAsync("https://localhost:44347/api/User/refresh-token", stringContent);
             var chk = loginResponse.Content.ReadAsStringAsync().Result;
 
 
             var authCookie = cookieContainer.GetCookies(new Uri("https://localhost:44347/")).Cast<Cookie>().Single(cookie => cookie.Name == "refreshToken");
-            cookieContainer.SetCookies(new Uri("https://localhost:44347/"), "refreshToken=" + authCookie.Value);
-         //   return RedirectToAction("Index", "Home", new { Area = "Users" });
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(10),
+            };
+            Response.Cookies.Append("refreshToken", authCookie.Value, cookieOptions);
 
             return View();
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -52,7 +53,12 @@ namespace WebApplication1.Controllers
 
 
             var authCookie = cookieContainer.GetCookies(new Uri("https://localhost:44347/")).Cast<Cookie>().Single(cookie => cookie.Name == "refreshToken");
-            cookieContainer.SetCookies(new Uri("https://localhost:44347/"), "refreshToken="+authCookie.Value);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(10),
+            };
+            Response.Cookies.Append("refreshToken", authCookie.Value, cookieOptions);
             return RedirectToAction("Index", "Home", new { Area = "Users" });
         }
 
