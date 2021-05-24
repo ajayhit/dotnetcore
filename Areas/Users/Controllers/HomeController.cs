@@ -18,6 +18,7 @@ namespace WebApplication1.Areas.Users.Controllers
         public async Task<IActionResult> Index()
         {
             var refreshToken = Request.Cookies["refreshToken"];
+            refreshToken = WebUtility.UrlDecode(refreshToken);
             CookieContainer cookieContainer = new CookieContainer();
             HttpClientHandler handler = new HttpClientHandler
             {
