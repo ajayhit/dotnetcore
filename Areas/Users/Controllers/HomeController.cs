@@ -50,5 +50,45 @@ namespace WebApplication1.Areas.Users.Controllers
 
             return View();
         }
+        public async Task<IActionResult> Logout()
+        {
+            //var refreshToken = Request.Cookies["refreshToken"];
+            //var jwt = Request.Cookies["jwt"];
+
+            //var client = new RestClient("https://localhost:44346/api/user/revoke-token");
+            //client.Timeout = -1;
+            //var request = new RestRequest(Method.POST);
+            //request.AddHeader("Content-Type", "application/json");
+            //var body = new
+            //{
+            //    Token = refreshToken
+            //};
+            //var bodypart = JsonConvert.SerializeObject(body);
+            //request.AddParameter("application/json", bodypart, ParameterType.RequestBody);
+            //IRestResponse response = client.Execute(request);
+            //return RedirectToAction(::);
+
+            var refreshToken = Request.Cookies["refreshToken"];
+            var jwt = Request.Cookies["jwt"];
+            refreshToken = WebUtility.UrlDecode(refreshToken);
+            CookieContainer cookieContainer = new CookieContainer();
+            HttpClientHandler handler = new HttpClientHandler
+            {
+                CookieContainer = cookieContainer
+            };
+            handler.CookieContainer = cookieContainer;
+            var client = new HttpClient(handler);
+            var req = new
+            {
+                Token = refreshToken
+            };
+            var req1 = JsonConvert.SerializeObject(req);
+            var stringContent = new StringContent(req1, Encoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
+
+
+            var loginResponse = await client.PostAsync("https://localhost:44347/api/user/revoke-token", stringContent);
+            var chk = loginResponse.Content.ReadAsStringAsync().Result;
+            return RedirectToAction("Index"); 
+        }
     }
 }
