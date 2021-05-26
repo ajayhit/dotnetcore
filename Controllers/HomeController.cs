@@ -33,16 +33,20 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Index(string useid,string pass)
         {
             CookieContainer cookieContainer = new CookieContainer();
+            string deviceinfo = Guid.NewGuid().ToString();
             HttpClientHandler handler = new HttpClientHandler
             {
                 CookieContainer = cookieContainer
             };
             handler.CookieContainer = cookieContainer;
             var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Add("X-Device-info", deviceinfo);
             var req = new
             {
-                Email = "user@secureapi.com",
-                Password = "Pa$$w0rd."
+                //Email = "user@secureapi.com",
+                //Password = "Pa$$w0rd." 
+                Email = "aj@ajay.com",
+                Password = "Ajay@123"
             };
             var req1 = JsonConvert.SerializeObject(req);
             var stringContent = new StringContent(req1, Encoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
@@ -59,6 +63,7 @@ namespace WebApplication1.Controllers
                 Expires = DateTime.UtcNow.AddDays(10),
             };
             Response.Cookies.Append("refreshToken", authCookie.Value, cookieOptions);
+            Response.Cookies.Append("jwt", deviceinfo, cookieOptions);
             return RedirectToAction("Index", "Home", new { Area = "Users" });
         }
 

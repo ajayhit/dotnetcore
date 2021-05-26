@@ -18,6 +18,7 @@ namespace WebApplication1.Areas.Users.Controllers
         public async Task<IActionResult> Index()
         {
             var refreshToken = Request.Cookies["refreshToken"];
+            var jwt = Request.Cookies["jwt"];
             refreshToken = WebUtility.UrlDecode(refreshToken);
             CookieContainer cookieContainer = new CookieContainer();
             HttpClientHandler handler = new HttpClientHandler
@@ -26,6 +27,7 @@ namespace WebApplication1.Areas.Users.Controllers
             };
             handler.CookieContainer = cookieContainer;
             var client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Add("X-Device-info", jwt);
             var req = new
             {
                 Token = refreshToken
