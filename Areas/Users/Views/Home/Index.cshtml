@@ -8,8 +8,15 @@
 
 @using (Html.BeginForm("Logout", "Home", FormMethod.Post))
 {
-   
+
     <div class="col-md-12">
         <input type="submit" value="Logout" />
+    </div>
+}
+@using (Html.BeginForm("Logoutalldevices", "Home", FormMethod.Post))
+{
+
+    <div class="col-md-12">
+        <input type="submit" value="Logout all Devices" />
     </div>
 }

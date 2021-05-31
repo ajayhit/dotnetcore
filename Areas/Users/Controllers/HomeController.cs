@@ -90,5 +90,29 @@ namespace WebApplication1.Areas.Users.Controllers
             var chk = loginResponse.Content.ReadAsStringAsync().Result;
             return RedirectToAction("Index"); 
         }
+        public async Task<IActionResult> Logoutalldevices()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var jwt = Request.Cookies["jwt"];
+            refreshToken = WebUtility.UrlDecode(refreshToken);
+            CookieContainer cookieContainer = new CookieContainer();
+            HttpClientHandler handler = new HttpClientHandler
+            {
+                CookieContainer = cookieContainer
+            };
+            handler.CookieContainer = cookieContainer;
+            var client = new HttpClient(handler);
+            var req = new
+            {
+                Token = refreshToken
+            };
+            var req1 = JsonConvert.SerializeObject(req);
+            var stringContent = new StringContent(req1, Encoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
+
+
+            var loginResponse = await client.PostAsync("https://localhost:44347/api/user/revoke-token-All", stringContent);
+            var chk = loginResponse.Content.ReadAsStringAsync().Result;
+            return RedirectToAction("Index");
+        }
     }
 }
