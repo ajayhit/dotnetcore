@@ -46,15 +46,15 @@ namespace WebApplication1.Controllers
                 //Email = "user@secureapi.com",
                 //Password = "Pa$$w0rd." 
                 Email = "aj@ajay.com",
-                Password = "Ajay@123"
+                Password = "Ajay@1231"
             };
             var req1 = JsonConvert.SerializeObject(req);
             var stringContent = new StringContent(req1, Encoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
 
 
             var loginResponse =await  client.PostAsync("https://localhost:44347/api/User/token", stringContent);
-            var chk = loginResponse.Content.ReadAsStringAsync().Result; 
-
+            var chk = loginResponse.Content.ReadAsStringAsync().Result;
+            dynamic resp = JsonConvert.DeserializeObject(chk);
 
             var authCookie = cookieContainer.GetCookies(new Uri("https://localhost:44347/")).Cast<Cookie>().Single(cookie => cookie.Name == "refreshToken");
             var cookieOptions = new CookieOptions
@@ -63,6 +63,7 @@ namespace WebApplication1.Controllers
                 Expires = DateTime.UtcNow.AddDays(10),
             };
             Response.Cookies.Append("refreshToken", authCookie.Value, cookieOptions);
+            Response.Cookies.Append("Email", resp.email.ToString(), cookieOptions);
             Response.Cookies.Append("jwt", deviceinfo, cookieOptions);
             return RedirectToAction("Index", "Home", new { Area = "Users" });
         }

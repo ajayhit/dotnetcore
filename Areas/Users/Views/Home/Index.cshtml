@@ -20,3 +20,16 @@
         <input type="submit" value="Logout all Devices" />
     </div>
 }
+@using (Html.BeginForm("ChangePassword", "Home", FormMethod.Post))
+{
+
+    <div class="col-md-12">
+        @Html.TextBox("txtpassword", "", new { placeholder = "Password" })
+    </div>
+    <div class="col-md-12">
+        @Html.TextBox("txtNewpassword", "", new { placeholder = "New Password" })
+    </div>
+    <div class="col-md-12">
+        <input type="submit" value="Change Password" />
+    </div>
+}
